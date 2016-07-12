@@ -15,10 +15,22 @@ import (
 //go:generate esc -o data.go -pkg fake data
 
 // cat/subcat/lang/samples
-type samplesTree map[string]map[string][]string
+type cache map[string]map[string][]string
 
-var samplesLock sync.Mutex
-var samplesCache = make(samplesTree)
+func (c cache) hasKeyPath(lang, cat string) bool {
+	if _, ok := c[lang]; ok {
+		if _, ok = c[lang][cat]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+var samples = struct {
+	sync.RWMutex
+	cache
+}{cache: make(cache)}
+
 var r = rand.New(&rndSrc{src: rand.NewSource(time.Now().UnixNano())})
 var lang = "en"
 var useExternalData = false
@@ -88,15 +100,6 @@ func EnFallback(flag bool) {
 	enFallback = flag
 }
 
-func (st samplesTree) hasKeyPath(lang, cat string) bool {
-	if _, ok := st[lang]; ok {
-		if _, ok = st[lang][cat]; ok {
-			return true
-		}
-	}
-	return false
-}
-
 func join(parts ...string) string {
 	var filtered []string
 	for _, part := range parts {
@@ -121,29 +124,25 @@ func generate(lag, cat string, fallback bool) string {
 }
 
 func lookup(lang, cat string, fallback bool) string {
-	samplesLock.Lock()
-	s := _lookup(lang, cat, fallback)
-	samplesLock.Unlock()
-	return s
-}
+	var s []string
 
-func _lookup(lang, cat string, fallback bool) string {
-	var samples []string
-
-	if samplesCache.hasKeyPath(lang, cat) {
-		samples = samplesCache[lang][cat]
-	} else {
-		var err error
-		samples, err = populateSamples(lang, cat)
-		if err != nil {
-			if lang != "en" && fallback && enFallback && err.Error() == ErrNoSamples.Error() {
-				return _lookup("en", cat, false)
-			}
-			return ""
-		}
+	samples.RLock()
+	if samples.cache.hasKeyPath(lang, cat) {
+		s = samples.cache[lang][cat]
+		samples.RUnlock()
+		return s[r.Intn(len(s))]
 	}
+	samples.RUnlock()
 
-	return samples[r.Intn(len(samples))]
+	var err error
+	s, err = populateSamples(lang, cat)
+	if err != nil {
+		if lang != "en" && fallback && enFallback && err.Error() == ErrNoSamples.Error() {
+			return lookup("en", cat, false)
+		}
+		return ""
+	}
+	return s[r.Intn(len(s))]
 }
 
 func populateSamples(lang, cat string) ([]string, error) {
@@ -152,14 +151,16 @@ func populateSamples(lang, cat string) ([]string, error) {
 		return nil, err
 	}
 
-	if _, ok := samplesCache[lang]; !ok {
-		samplesCache[lang] = make(map[string][]string)
+	s := strings.Split(strings.TrimSpace(string(data)), "\n")
+
+	samples.Lock()
+	if _, ok := samples.cache[lang]; !ok {
+		samples.cache[lang] = make(map[string][]string)
 	}
+	samples.cache[lang][cat] = s
+	samples.Unlock()
 
-	samples := strings.Split(strings.TrimSpace(string(data)), "\n")
-
-	samplesCache[lang][cat] = samples
-	return samples, nil
+	return s, nil
 }
 
 func readFile(lang, cat string) (f []byte, err error) {
