@@ -31,7 +31,10 @@ var samples = struct {
 	cache
 }{cache: make(cache)}
 
-var r = rand.New(&rndSrc{src: rand.NewSource(time.Now().UnixNano())})
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 var lang = "en"
 var useExternalData = false
 var enFallback = true
@@ -43,24 +46,6 @@ var (
 	// ErrNoSamples indicates that there are no samples for the given language
 	ErrNoSamples = errors.New("No samples found for given language")
 )
-
-type rndSrc struct {
-	mtx sync.Mutex
-	src rand.Source
-}
-
-func (s *rndSrc) Int63() int64 {
-	s.mtx.Lock()
-	n := s.src.Int63()
-	s.mtx.Unlock()
-	return n
-}
-
-func (s *rndSrc) Seed(n int64) {
-	s.mtx.Lock()
-	s.src.Seed(n)
-	s.mtx.Unlock()
-}
 
 // GetLangs returns a slice of available languages
 func GetLangs() []string {
@@ -117,7 +102,7 @@ func generate(lag, cat string, fallback bool) string {
 		if ru != '#' {
 			result += string(ru)
 		} else {
-			result += strconv.Itoa(r.Intn(10))
+			result += strconv.Itoa(rand.Intn(10))
 		}
 	}
 	return result
@@ -130,7 +115,7 @@ func lookup(lang, cat string, fallback bool) string {
 	if samples.cache.hasKeyPath(lang, cat) {
 		s = samples.cache[lang][cat]
 		samples.RUnlock()
-		return s[r.Intn(len(s))]
+		return s[rand.Intn(len(s))]
 	}
 	samples.RUnlock()
 
@@ -142,7 +127,7 @@ func lookup(lang, cat string, fallback bool) string {
 		}
 		return ""
 	}
-	return s[r.Intn(len(s))]
+	return s[rand.Intn(len(s))]
 }
 
 func populateSamples(lang, cat string) ([]string, error) {
