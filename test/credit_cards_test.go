@@ -6,36 +6,29 @@ import (
 	"github.com/syscrusher/fake"
 )
 
-func TestCreditCards(t *testing.T) {
-	for _, lang := range fake.GetLangs() {
-		err := fake.SetLang(lang)
-		if err != nil {
-			t.Errorf("Could not set language %s", lang)
-		}
+func TestCreditCardType(t *testing.T) {
+	t.Parallel()
 
-		t.Run("CreditCardType", func(t *testing.T) {
-			t.Parallel()
-			v := fake.CreditCardType()
-			if v == "" {
-				t.Errorf("CreditCardType failed with lang %s", lang)
-			}
-		})
+	v := fake.CreditCardType()
+	if v == "" {
+		t.Error("CreditCardType failed.")
+	}
+}
 
-		t.Run("CreditCardNum-RandomVendor", func(t *testing.T) {
-			t.Parallel()
-			v := fake.CreditCardNum("")
-			if v == "" {
-				t.Errorf("CreditCardNum failed with lang %s", lang)
-			}
-		})
+func TestCreditCardNumRandom(t *testing.T) {
+	t.Parallel()
 
-		t.Run("CreditCardNum-SpecificVendor", func(t *testing.T) {
-			t.Parallel()
-			v := fake.CreditCardNum("visa")
-			if v == "" {
-				t.Errorf("CreditCardNum failed with lang %s", lang)
-			}
-		})
+	v := fake.CreditCardNum("")
+	if v == "" {
+		t.Error("CreditCardNum failed to generate random card number.")
+	}
+}
 
+func TestCreditCardNumVisa(t *testing.T) {
+	t.Parallel()
+
+	v := fake.CreditCardNum("visa")
+	if v == "" {
+		t.Error("CreditCardNum failed to generate visa card number.")
 	}
 }

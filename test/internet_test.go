@@ -14,7 +14,6 @@ var internetFuncs = map[string]func() string{
 	"EmailSubject":   fake.EmailSubject,
 	"EmailBody":      fake.EmailBody,
 	"DomainZone":     fake.DomainZone,
-	"IPv4":           fake.IPv4,
 }
 
 func TestInternet(t *testing.T) {
@@ -34,5 +33,13 @@ func TestInternet(t *testing.T) {
 			})
 		}
 
+	}
+}
+
+func TestIPv4(t *testing.T) {
+	t.Parallel()
+
+	if ip := fake.IPv4(); ip == "" {
+		t.Error("IPv4 failed")
 	}
 }

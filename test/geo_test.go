@@ -6,61 +6,68 @@ import (
 	"github.com/syscrusher/fake"
 )
 
-func TestGeo(t *testing.T) {
-	for _, lang := range fake.GetLangs() {
-		err := fake.SetLang(lang)
-		if err != nil {
-			t.Errorf("Could not set language %s", lang)
-		}
+func TestGeoLongLat(t *testing.T) {
+	t.Parallel()
 
-		f := fake.Latitute()
-		if f == 0 {
-			t.Errorf("Latitude failed with lang %s", lang)
-		}
+	f := fake.Latitute()
+	if f == 0 {
+		t.Error("Latitude zeroed")
+	}
 
-		i := fake.LatitudeDegrees()
-		if i < -180 || i > 180 {
-			t.Errorf("LatitudeDegrees failed with lang %s", lang)
-		}
+	f = fake.Longitude()
+	if f == 0 {
+		t.Error("Longitude zeroed")
+	}
+}
 
-		i = fake.LatitudeMinutes()
-		if i < 0 || i >= 60 {
-			t.Errorf("LatitudeMinutes failed with lang %s", lang)
-		}
+func TestGeoMinSecs(t *testing.T) {
+	t.Parallel()
 
-		i = fake.LatitudeSeconds()
-		if i < 0 || i >= 60 {
-			t.Errorf("LatitudeSeconds failed with lang %s", lang)
-		}
+	i := fake.LatitudeMinutes()
+	if i < 0 || i >= 60 {
+		t.Errorf("LatitudeMinutes failed, got %v", i)
+	}
 
-		s := fake.LatitudeDirection()
-		if s != "N" && s != "S" {
-			t.Errorf("LatitudeDirection failed with lang %s", lang)
-		}
+	i = fake.LatitudeSeconds()
+	if i < 0 || i >= 60 {
+		t.Errorf("LatitudeSeconds failed, got %v", i)
+	}
+	i = fake.LongitudeMinutes()
+	if i < 0 || i >= 60 {
+		t.Errorf("LongitudeMinutes failed, got %v", i)
+	}
 
-		f = fake.Longitude()
-		if f == 0 {
-			t.Errorf("Longitude failed with lang %s", lang)
-		}
+	i = fake.LongitudeSeconds()
+	if i < 0 || i >= 60 {
+		t.Errorf("LongitudeSeconds failed, got %v", i)
+	}
+}
 
-		i = fake.LongitudeDegrees()
-		if i < -180 || i > 180 {
-			t.Errorf("LongitudeDegrees failed with lang %s", lang)
-		}
+func TestGeoDegrees(t *testing.T) {
+	t.Parallel()
 
-		i = fake.LongitudeMinutes()
-		if i < 0 || i >= 60 {
-			t.Errorf("LongitudeMinutes failed with lang %s", lang)
-		}
+	i := fake.LatitudeDegrees()
+	if i < -180 || i > 180 {
+		t.Errorf("LatitudeDegrees failed, got %v", i)
+	}
 
-		i = fake.LongitudeSeconds()
-		if i < 0 || i >= 60 {
-			t.Errorf("LongitudeSeconds failed with lang %s", lang)
-		}
+	i = fake.LongitudeDegrees()
+	if i < -180 || i > 180 {
+		t.Errorf("LongitudeDegrees failed, got %v", i)
+	}
 
-		s = fake.LongitudeDirection()
-		if s != "W" && s != "E" {
-			t.Errorf("LongitudeDirection failed with lang %s", lang)
-		}
+}
+
+func TestGeoDirection(t *testing.T) {
+	t.Parallel()
+
+	s := fake.LatitudeDirection()
+	if s != "N" && s != "S" {
+		t.Errorf("LatitudeDirection failed, got %v", s)
+	}
+
+	s = fake.LongitudeDirection()
+	if s != "W" && s != "E" {
+		t.Errorf("LongitudeDirection failed, got %v", s)
 	}
 }
