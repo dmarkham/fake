@@ -1,20 +1,16 @@
-package test
+package fake
 
-import (
-	"testing"
-
-	"github.com/syscrusher/fake"
-)
+import "testing"
 
 func TestGeoLongLat(t *testing.T) {
 	t.Parallel()
 
-	f := fake.Latitute()
+	f := Latitute()
 	if f == 0 {
 		t.Error("Latitude zeroed")
 	}
 
-	f = fake.Longitude()
+	f = Longitude()
 	if f == 0 {
 		t.Error("Longitude zeroed")
 	}
@@ -23,21 +19,21 @@ func TestGeoLongLat(t *testing.T) {
 func TestGeoMinSecs(t *testing.T) {
 	t.Parallel()
 
-	i := fake.LatitudeMinutes()
+	i := LatitudeMinutes()
 	if i < 0 || i >= 60 {
 		t.Errorf("LatitudeMinutes failed, got %v", i)
 	}
 
-	i = fake.LatitudeSeconds()
+	i = LatitudeSeconds()
 	if i < 0 || i >= 60 {
 		t.Errorf("LatitudeSeconds failed, got %v", i)
 	}
-	i = fake.LongitudeMinutes()
+	i = LongitudeMinutes()
 	if i < 0 || i >= 60 {
 		t.Errorf("LongitudeMinutes failed, got %v", i)
 	}
 
-	i = fake.LongitudeSeconds()
+	i = LongitudeSeconds()
 	if i < 0 || i >= 60 {
 		t.Errorf("LongitudeSeconds failed, got %v", i)
 	}
@@ -46,12 +42,12 @@ func TestGeoMinSecs(t *testing.T) {
 func TestGeoDegrees(t *testing.T) {
 	t.Parallel()
 
-	i := fake.LatitudeDegrees()
+	i := LatitudeDegrees()
 	if i < -180 || i > 180 {
 		t.Errorf("LatitudeDegrees failed, got %v", i)
 	}
 
-	i = fake.LongitudeDegrees()
+	i = LongitudeDegrees()
 	if i < -180 || i > 180 {
 		t.Errorf("LongitudeDegrees failed, got %v", i)
 	}
@@ -61,12 +57,12 @@ func TestGeoDegrees(t *testing.T) {
 func TestGeoDirection(t *testing.T) {
 	t.Parallel()
 
-	s := fake.LatitudeDirection()
+	s := LatitudeDirection()
 	if s != "N" && s != "S" {
 		t.Errorf("LatitudeDirection failed, got %v", s)
 	}
 
-	s = fake.LongitudeDirection()
+	s = LongitudeDirection()
 	if s != "W" && s != "E" {
 		t.Errorf("LongitudeDirection failed, got %v", s)
 	}

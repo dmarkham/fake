@@ -1,15 +1,11 @@
-package test
+package fake
 
-import (
-	"testing"
-
-	"github.com/syscrusher/fake"
-)
+import "testing"
 
 func TestCreditCardType(t *testing.T) {
 	t.Parallel()
 
-	v := fake.CreditCardType()
+	v := CreditCardType()
 	if v == "" {
 		t.Error("CreditCardType failed.")
 	}
@@ -18,7 +14,7 @@ func TestCreditCardType(t *testing.T) {
 func TestCreditCardNumRandom(t *testing.T) {
 	t.Parallel()
 
-	v := fake.CreditCardNum("")
+	v := CreditCardNum("")
 	if v == "" {
 		t.Error("CreditCardNum failed to generate random card number.")
 	}
@@ -27,7 +23,7 @@ func TestCreditCardNumRandom(t *testing.T) {
 func TestCreditCardNumVisa(t *testing.T) {
 	t.Parallel()
 
-	v := fake.CreditCardNum("visa")
+	v := CreditCardNum("visa")
 	if v == "" {
 		t.Error("CreditCardNum failed to generate visa card number.")
 	}
