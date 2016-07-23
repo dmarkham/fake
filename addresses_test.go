@@ -1,6 +1,21 @@
 package fake
 
-import "testing"
+import (
+	"math/rand"
+	"testing"
+)
+
+func TestCity(t *testing.T) {
+	rand.Seed(0)
+	for i := 0; i < 10; i++ {
+		t.Run("City-deterministic", func(t *testing.T) {
+			c := City()
+			if c == "" {
+				t.Fail()
+			}
+		})
+	}
+}
 
 func TestAddressesStateAbbrev(t *testing.T) {
 	for _, lang := range GetLangs() {

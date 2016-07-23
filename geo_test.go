@@ -1,6 +1,9 @@
 package fake
 
-import "testing"
+import (
+	"math/rand"
+	"testing"
+)
 
 func TestGeoLongLat(t *testing.T) {
 	t.Parallel()
@@ -57,13 +60,24 @@ func TestGeoDegrees(t *testing.T) {
 func TestGeoDirection(t *testing.T) {
 	t.Parallel()
 
-	s := LatitudeDirection()
-	if s != "N" && s != "S" {
-		t.Errorf("LatitudeDirection failed, got %v", s)
+	rand.Seed(0)
+	for i := 0; i < 4; i++ {
+		t.Run("GeoDirectionLatitude-deterministic", func(t *testing.T) {
+			t.Parallel()
+			d := LatitudeDirection()
+			if d == "" {
+				t.Fail()
+			}
+		})
 	}
 
-	s = LongitudeDirection()
-	if s != "W" && s != "E" {
-		t.Errorf("LongitudeDirection failed, got %v", s)
+	for i := 0; i < 4; i++ {
+		t.Run("GeoDirectionLatitude-deterministic", func(t *testing.T) {
+			t.Parallel()
+			d := LongitudeDirection()
+			if d == "" {
+				t.Fail()
+			}
+		})
 	}
 }
