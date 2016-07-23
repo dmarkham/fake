@@ -2,31 +2,37 @@ package fake
 
 import "testing"
 
-func TestLoremIpsum(t *testing.T) {
+var loremIpsumFuncs = map[string]func(int) string{
+	"CharactersN": CharactersN,
+	"WordsN":      WordsN,
+	"SentencesN":  SentencesN,
+	"ParagraphsN": ParagraphsN,
+}
+
+func TestLoremIpsumN(t *testing.T) {
 	for _, lang := range GetLangs() {
 		err := SetLang(lang)
 		if err != nil {
 			t.Errorf("Could not set language %s", lang)
 		}
 
-		v := CharactersN(2)
-		if v == "" {
-			t.Errorf("CharactersN failed with lang %s", lang)
+		for name, funct := range loremIpsumFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(2); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
+	}
+}
 
-		v = WordsN(2)
-		if v == "" {
-			t.Errorf("WordsN failed with lang %s", lang)
-		}
-
-		v = SentencesN(2)
-		if v == "" {
-			t.Errorf("SentencesN failed with lang %s", lang)
-		}
-
-		v = ParagraphsN(2)
-		if v == "" {
-			t.Errorf("ParagraphsN failed with lang %s", lang)
+func TestLoremIpsumUnique(t *testing.T) {
+	for _, lang := range GetLangs() {
+		err := SetLang(lang)
+		if err != nil {
+			t.Errorf("Could not set language %s", lang)
 		}
 
 		vs := WordsNUnique(251)
