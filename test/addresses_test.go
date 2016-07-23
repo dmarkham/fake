@@ -6,6 +6,17 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var addressFuncs = map[string]func() string{
+	"Continent":     fake.Continent,
+	"Country":       fake.Country,
+	"City":          fake.City,
+	"Phone":         fake.Phone,
+	"State":         fake.State,
+	"Street":        fake.Street,
+	"StreetAddress": fake.StreetAddress,
+	"Zip":           fake.Zip,
+}
+
 func TestAddresses(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
@@ -13,49 +24,21 @@ func TestAddresses(t *testing.T) {
 			t.Errorf("Could not set language %s", lang)
 		}
 
-		v := fake.Continent()
-		if v == "" {
-			t.Errorf("Continent failed with lang %s", lang)
+		for name, funct := range addressFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
 
-		v = fake.Country()
-		if v == "" {
-			t.Errorf("Country failed with lang %s", lang)
-		}
-
-		v = fake.City()
-		if v == "" {
-			t.Errorf("City failed with lang %s", lang)
-		}
-
-		v = fake.State()
-		if v == "" {
-			t.Errorf("State failed with lang %s", lang)
-		}
-
-		v = fake.StateAbbrev()
-		if v == "" && lang == "en" {
+		// Special case for StateAbbrev
+		// We don't have RU state abbreviations, and english fallbacks are inapproprirate
+		v := fake.StateAbbrev()
+		if v == "" && lang != "ru" {
 			t.Errorf("StateAbbrev failed with lang %s", lang)
-		}
-
-		v = fake.Street()
-		if v == "" {
-			t.Errorf("Street failed with lang %s", lang)
-		}
-
-		v = fake.StreetAddress()
-		if v == "" {
-			t.Errorf("StreetAddress failed with lang %s", lang)
-		}
-
-		v = fake.Zip()
-		if v == "" {
-			t.Errorf("Zip failed with lang %s", lang)
-		}
-
-		v = fake.Phone()
-		if v == "" {
-			t.Errorf("Phone failed with lang %s", lang)
 		}
 	}
 }

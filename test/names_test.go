@@ -6,6 +6,27 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var namesFuncs = map[string]func() string{
+	"MaleFirstName":            fake.MaleFirstName,
+	"FemaleFirstName":          fake.FemaleFirstName,
+	"FirstName":                fake.FirstName,
+	"MaleLastName":             fake.MaleLastName,
+	"FemaleLastName":           fake.FemaleLastName,
+	"LastName":                 fake.LastName,
+	"MalePatronymic":           fake.MalePatronymic,
+	"FemalePatronymic":         fake.FemalePatronymic,
+	"Patronymic":               fake.Patronymic,
+	"MaleFullNameWithPrefix":   fake.MaleFullNameWithPrefix,
+	"FemaleFullNameWithPrefix": fake.FemaleFullNameWithPrefix,
+	"FullNameWithPrefix":       fake.FullNameWithPrefix,
+	"MaleFullNameWithSuffix":   fake.MaleFullNameWithSuffix,
+	"FemaleFullNameWithSuffix": fake.FemaleFullNameWithSuffix,
+	"FullNameWithSuffix":       fake.FullNameWithSuffix,
+	"MaleFullName":             fake.MaleFullName,
+	"FemaleFullName":           fake.FemaleFullName,
+	"FullName":                 fake.FullName,
+}
+
 func TestNames(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
@@ -13,94 +34,14 @@ func TestNames(t *testing.T) {
 			t.Errorf("Could not set language %s", lang)
 		}
 
-		v := fake.MaleFirstName()
-		if v == "" {
-			t.Errorf("MaleFirstName failed with lang %s", lang)
-		}
-
-		v = fake.FemaleFirstName()
-		if v == "" {
-			t.Errorf("FemaleFirstName failed with lang %s", lang)
-		}
-
-		v = fake.FirstName()
-		if v == "" {
-			t.Errorf("FirstName failed with lang %s", lang)
-		}
-
-		v = fake.MaleLastName()
-		if v == "" {
-			t.Errorf("MaleLastName failed with lang %s", lang)
-		}
-
-		v = fake.FemaleLastName()
-		if v == "" {
-			t.Errorf("FemaleLastName failed with lang %s", lang)
-		}
-
-		v = fake.LastName()
-		if v == "" {
-			t.Errorf("LastName failed with lang %s", lang)
-		}
-
-		v = fake.MalePatronymic()
-		if v == "" {
-			t.Errorf("MalePatronymic failed with lang %s", lang)
-		}
-
-		v = fake.FemalePatronymic()
-		if v == "" {
-			t.Errorf("FemalePatronymic failed with lang %s", lang)
-		}
-
-		v = fake.Patronymic()
-		if v == "" {
-			t.Errorf("Patronymic failed with lang %s", lang)
-		}
-
-		v = fake.MaleFullNameWithPrefix()
-		if v == "" {
-			t.Errorf("MaleFullNameWithPrefix failed with lang %s", lang)
-		}
-
-		v = fake.FemaleFullNameWithPrefix()
-		if v == "" {
-			t.Errorf("FemaleFullNameWithPrefix failed with lang %s", lang)
-		}
-
-		v = fake.FullNameWithPrefix()
-		if v == "" {
-			t.Errorf("FullNameWithPrefix failed with lang %s", lang)
-		}
-
-		v = fake.MaleFullNameWithSuffix()
-		if v == "" {
-			t.Errorf("MaleFullNameWithSuffix failed with lang %s", lang)
-		}
-
-		v = fake.FemaleFullNameWithSuffix()
-		if v == "" {
-			t.Errorf("FemaleFullNameWithSuffix failed with lang %s", lang)
-		}
-
-		v = fake.FullNameWithSuffix()
-		if v == "" {
-			t.Errorf("FullNameWithSuffix failed with lang %s", lang)
-		}
-
-		v = fake.MaleFullName()
-		if v == "" {
-			t.Errorf("MaleFullName failed with lang %s", lang)
-		}
-
-		v = fake.FemaleFullName()
-		if v == "" {
-			t.Errorf("FemaleFullName failed with lang %s", lang)
-		}
-
-		v = fake.FullName()
-		if v == "" {
-			t.Errorf("FullName failed with lang %s", lang)
+		for name, funct := range namesFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
 	}
 }

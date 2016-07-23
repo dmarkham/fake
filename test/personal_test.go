@@ -6,6 +6,12 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var personalFuncs = map[string]func() string{
+	"Gender":       fake.Gender,
+	"GenderAbbrev": fake.GenderAbbrev,
+	"Language":     fake.Language,
+}
+
 func TestPersonal(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
@@ -13,19 +19,14 @@ func TestPersonal(t *testing.T) {
 			t.Errorf("Could not set language %s", lang)
 		}
 
-		v := fake.Gender()
-		if v == "" {
-			t.Errorf("Gender failed with lang %s", lang)
-		}
-
-		v = fake.GenderAbbrev()
-		if v == "" {
-			t.Errorf("GenderAbbrev failed with lang %s", lang)
-		}
-
-		v = fake.Language()
-		if v == "" {
-			t.Errorf("Language failed with lang %s", lang)
+		for name, funct := range personalFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
 	}
 }

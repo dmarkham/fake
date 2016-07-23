@@ -6,6 +6,11 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var currencyFuncs = map[string]func() string{
+	"Currency":     fake.Currency,
+	"CurrencyCode": fake.CurrencyCode,
+}
+
 func TestCurrencies(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
@@ -13,14 +18,14 @@ func TestCurrencies(t *testing.T) {
 			t.Errorf("Could not set language %s", lang)
 		}
 
-		v := fake.Currency()
-		if v == "" {
-			t.Errorf("Currency failed with lang %s", lang)
-		}
-
-		v = fake.CurrencyCode()
-		if v == "" {
-			t.Errorf("CurrencyCode failed with lang %s", lang)
+		for name, funct := range currencyFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
 	}
 }

@@ -6,6 +6,17 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var internetFuncs = map[string]func() string{
+	"UserName":       fake.UserName,
+	"TopLevelDomain": fake.TopLevelDomain,
+	"DomainName":     fake.DomainName,
+	"EmailAddress":   fake.EmailAddress,
+	"EmailSubject":   fake.EmailSubject,
+	"EmailBody":      fake.EmailBody,
+	"DomainZone":     fake.DomainZone,
+	"IPv4":           fake.IPv4,
+}
+
 func TestInternet(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
@@ -13,44 +24,15 @@ func TestInternet(t *testing.T) {
 			t.Errorf("Could not set language %s", lang)
 		}
 
-		v := fake.UserName()
-		if v == "" {
-			t.Errorf("UserName failed with lang %s", lang)
+		for name, funct := range internetFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
 
-		v = fake.TopLevelDomain()
-		if v == "" {
-			t.Errorf("TopLevelDomain failed with lang %s", lang)
-		}
-
-		v = fake.DomainName()
-		if v == "" {
-			t.Errorf("DomainName failed with lang %s", lang)
-		}
-
-		v = fake.EmailAddress()
-		if v == "" {
-			t.Errorf("EmailAddress failed with lang %s", lang)
-		}
-
-		v = fake.EmailSubject()
-		if v == "" {
-			t.Errorf("EmailSubject failed with lang %s", lang)
-		}
-
-		v = fake.EmailBody()
-		if v == "" {
-			t.Errorf("EmailBody failed with lang %s", lang)
-		}
-
-		v = fake.DomainZone()
-		if v == "" {
-			t.Errorf("DomainZone failed with lang %s", lang)
-		}
-
-		v = fake.IPv4()
-		if v == "" {
-			t.Errorf("IPv4 failed with lang %s", lang)
-		}
 	}
 }

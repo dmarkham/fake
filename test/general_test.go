@@ -6,6 +6,14 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var generalFuncs = map[string]func() string{
+	"SimplePassword": fake.SimplePassword,
+	"Color":          fake.Color,
+	"HexColor":       fake.HexColor,
+	"HexColorShort":  fake.HexColorShort,
+	"Digits":         fake.Digits,
+}
+
 func TestGeneral(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
@@ -13,29 +21,19 @@ func TestGeneral(t *testing.T) {
 			t.Errorf("Could not set language %s", lang)
 		}
 
+		for name, funct := range generalFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
+		}
+
 		v := fake.Password(4, 10, true, true, true)
 		if v == "" {
 			t.Errorf("Password failed with lang %s", lang)
-		}
-
-		v = fake.SimplePassword()
-		if v == "" {
-			t.Errorf("SimplePassword failed with lang %s", lang)
-		}
-
-		v = fake.Color()
-		if v == "" {
-			t.Errorf("Color failed with lang %s", lang)
-		}
-
-		v = fake.HexColor()
-		if v == "" {
-			t.Errorf("HexColor failed with lang %s", lang)
-		}
-
-		v = fake.HexColorShort()
-		if v == "" {
-			t.Errorf("HexColorShort failed with lang %s", lang)
 		}
 
 		v = fake.DigitsN(2)
@@ -43,9 +41,5 @@ func TestGeneral(t *testing.T) {
 			t.Errorf("DigitsN failed with lang %s", lang)
 		}
 
-		v = fake.Digits()
-		if v == "" {
-			t.Errorf("Digits failed with lang %s", lang)
-		}
 	}
 }

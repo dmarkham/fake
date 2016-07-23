@@ -7,11 +7,28 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var dateFuncs = map[string]func() string{
+	"WeekDay":      fake.WeekDay,
+	"WeekDayShort": fake.WeekDayShort,
+	"Month":        fake.Month,
+	"MonthShort":   fake.MonthShort,
+}
+
 func TestDates(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
 		if err != nil {
 			t.Errorf("Could not set language %s", lang)
+		}
+
+		for name, funct := range dateFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
 
 		from, _ := time.Parse("2006-01-02T15:04:05", "2016-01-01T00:00:00")
@@ -24,29 +41,14 @@ func TestDates(t *testing.T) {
 			t.Errorf("Time after %s to date %s", d, lang)
 		}
 
-		v := fake.WeekDay()
-		if v == "" {
-			t.Errorf("WeekDay failed with lang %s", lang)
+		n := fake.Day()
+		if n < 0 || n > 31 {
+			t.Errorf("Day failed with lang %s", lang)
 		}
 
-		v = fake.WeekDayShort()
-		if v == "" {
-			t.Errorf("WeekDayShort failed with lang %s", lang)
-		}
-
-		n := fake.WeekdayNum()
+		n = fake.WeekdayNum()
 		if n < 0 || n > 7 {
 			t.Errorf("WeekdayNum failed with lang %s", lang)
-		}
-
-		v = fake.Month()
-		if v == "" {
-			t.Errorf("Month failed with lang %s", lang)
-		}
-
-		v = fake.MonthShort()
-		if v == "" {
-			t.Errorf("MonthShort failed with lang %s", lang)
 		}
 
 		n = fake.MonthNum()

@@ -6,6 +6,13 @@ import (
 	"github.com/syscrusher/fake"
 )
 
+var productsFuncs = map[string]func() string{
+	"Brand":       fake.Brand,
+	"ProductName": fake.ProductName,
+	"Product":     fake.Product,
+	"Model":       fake.Model,
+}
+
 func TestProducts(t *testing.T) {
 	for _, lang := range fake.GetLangs() {
 		err := fake.SetLang(lang)
@@ -13,24 +20,14 @@ func TestProducts(t *testing.T) {
 			t.Errorf("Could not set language %s", lang)
 		}
 
-		v := fake.Brand()
-		if v == "" {
-			t.Errorf("Brand failed with lang %s", lang)
-		}
-
-		v = fake.ProductName()
-		if v == "" {
-			t.Errorf("ProductName failed with lang %s", lang)
-		}
-
-		v = fake.Product()
-		if v == "" {
-			t.Errorf("Product failed with lang %s", lang)
-		}
-
-		v = fake.Model()
-		if v == "" {
-			t.Errorf("Model failed with lang %s", lang)
+		for name, funct := range productsFuncs {
+			name, funct := name, funct // capture range variable
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				if a := funct(); a == "" {
+					t.Errorf("%s failed with lang %s", name, lang)
+				}
+			})
 		}
 	}
 }
