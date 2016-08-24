@@ -42,13 +42,13 @@ func TestCreditCardNumLuhn(t *testing.T) {
 	t.Parallel()
 
 	var validCCs = []struct {
-		num          string
+		num          []int
 		controlDigit int
 	}{
-		{"111111111", 6},
-		{"811218987", 6},
-		{"654166340827313", 2},
-		{"34087773108580", 9},
+		{[]int{1, 1, 1, 1, 1, 1, 1, 1, 1}, 6},
+		{[]int{8, 1, 1, 2, 1, 8, 9, 8, 7}, 6},
+		{[]int{6, 5, 4, 1, 6, 6, 3, 4, 0, 8, 2, 7, 3, 1, 3}, 2},
+		{[]int{3, 4, 0, 8, 7, 7, 7, 3, 1, 0, 8, 5, 8, 0}, 9},
 	}
 
 	for _, cc := range validCCs {

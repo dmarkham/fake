@@ -10,15 +10,15 @@ import (
 type creditCard struct {
 	vendor   string
 	length   int
-	prefixes []string
+	prefixes [][]int
 }
 
 // https://en.wikipedia.org/wiki/Payment_card_number#Issuer_identification_number_.28IIN.29
 var creditCards = map[string]creditCard{
-	"amex":       {"American Express", 15, []string{"34", "37"}},
-	"discover":   {"Discover", 16, []string{"6011", "622126", "622925", "644", "649", "65"}},
-	"mastercard": {"MasterCard", 16, []string{"5"}},
-	"visa":       {"VISA", 16, []string{"4"}},
+	"amex":       {"American Express", 15, [][]int{[]int{3, 4}, []int{3, 7}}},
+	"discover":   {"Discover", 16, [][]int{[]int{6, 0, 1, 1}, []int{6, 2, 2, 1, 2, 6}, []int{6, 2, 2, 9, 2, 5}, []int{6, 4, 4}, []int{6, 4, 9}, []int{6, 5}}},
+	"mastercard": {"MasterCard", 16, [][]int{[]int{5}}},
+	"visa":       {"VISA", 16, [][]int{[]int{4}}},
 }
 
 // CreditCardType returns one of the following credit values:
@@ -50,7 +50,12 @@ func CreditCardNum(vendor string) string {
 
 	num := generateWithPrefix(card.length, prefix)
 
-	return num
+	var final string
+	for i := 0; i < len(num); i++ {
+		final = final + strconv.Itoa(num[i])
+	}
+
+	return final
 }
 
 // Remainder of file adapted from github.com/joeljunstrom/go-luhn
@@ -59,33 +64,27 @@ func CreditCardNum(vendor string) string {
 // generateWithPrefix creates and returns a string of the length of the argument targetSize
 // but prefixed with the second argument.
 // The returned string is valid according to the Luhn algorithm.
-func generateWithPrefix(size int, prefix string) string {
+func generateWithPrefix(size int, prefix []int) []int {
 	size = size - 1 - len(prefix)
 
-	random := prefix + randomString(size)
-	controlDigit := strconv.Itoa(generateControlDigit(random))
+	random := append(prefix, randomIntSlice(size)...)
+	controlDigit := generateControlDigit(random)
 
-	return random + controlDigit
+	return append(random, controlDigit)
 }
 
-func randomString(size int) string {
+func randomIntSlice(size int) []int {
 	rand.Seed(time.Now().UTC().UnixNano())
-	source := make([]int, size)
+	result := make([]int, size)
 
 	for i := 0; i < size; i++ {
-		source[i] = rand.Intn(9)
+		result[i] = rand.Intn(9)
 	}
 
-	result := make([]string, len(source))
-
-	for i, number := range source {
-		result[i] = strconv.Itoa(number)
-	}
-
-	return strings.Join(result, "")
+	return result
 }
 
-func generateControlDigit(luhnString string) int {
+func generateControlDigit(luhnString []int) int {
 	controlDigit := calculateChecksum(luhnString, true) % 10
 
 	if controlDigit != 0 {
@@ -95,13 +94,11 @@ func generateControlDigit(luhnString string) int {
 	return controlDigit
 }
 
-func calculateChecksum(luhnString string, double bool) int {
-	source := strings.Split(luhnString, "")
+func calculateChecksum(luhnString []int, double bool) int {
 	checksum := 0
 
-	for i := len(source) - 1; i > -1; i-- {
-		t, _ := strconv.ParseInt(source[i], 10, 8)
-		n := int(t)
+	for i := len(luhnString) - 1; i > -1; i-- {
+		n := luhnString[i]
 
 		if double {
 			n = n * 2
