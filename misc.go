@@ -54,3 +54,11 @@ func Religions(n int) (a []string) {
 func Question() string {
 	return Sentence() + "?"
 }
+
+func Amount() float32 {
+	return rand.Float32()
+}
+
+func Between(from, to int) int {
+	return rand.Intn(to-from) + from
+}
