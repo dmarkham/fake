@@ -21,6 +21,14 @@ func MaritalStatus() string {
 	return Choose("Single", "Married", "Separated", "Divorced", "Widow", "Widower").(string)
 }
 
+func SexualOrientation() string {
+	return Choose("Straight", "Gay", "Lesbian", "Bisexual", "Other").(string)
+}
+
+func Education() string {
+	return Choose("None", "Home Schooled", "High School", "Diploma", "Associate Degree", "Bachelors", "Masters", "Doctorate", "Other").(string)
+}
+
 func Ethnicity() string {
 	return Choose("Asian", "Black", "White", "Other").(string)
 }
