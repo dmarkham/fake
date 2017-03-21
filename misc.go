@@ -62,3 +62,10 @@ func Amount() float32 {
 func Between(from, to int) int {
 	return rand.Intn(to-from) + from
 }
+
+func Version() string {
+	ma := rand.Intn(10)
+	mi := rand.Intn(100)
+	dot := rand.Intn(100)
+	return fmt.Sprintf("%v.%v.%v", ma, mi, dot)
+}
