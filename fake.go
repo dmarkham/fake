@@ -37,7 +37,7 @@ var (
 // Seed uses the provided seed value to initialize the internal PRNG to a
 // deterministic state.
 func Seed(seed int64) {
-	r.Seed(seed)
+	rand.Seed(seed)
 }
 
 // GetLangs returns a slice of available languages
@@ -79,6 +79,11 @@ func UseExternalData(flag bool) {
 	useExternalData = flag
 }
 
+// EnFallback sets the flag that allows fake to fallback to englsh samples if the ones for the used languaged are not available
+func EnFallback(flag bool) {
+	enFallback = flag
+}
+
 // map[lang]map[cat][]samples
 type cache map[string]map[string][]string
 
@@ -96,15 +101,14 @@ var samples = struct {
 	cache
 }{cache: make(cache)}
 
-func generate(lang, cat string, fallback bool) string {
-	format := lookup(lang, cat+"_format", fallback)
-	var result string
-	for _, ru := range format {
-		if ru != '#' {
-			result += string(ru)
-		} else {
-			result += strconv.Itoa(r.Intn(10))
-		}
+func lookup(lang, cat string, fallback bool) string {
+	var s []string
+
+	samples.RLock()
+	if samples.cache.hasKeyPath(lang, cat) {
+		s = samples.cache[lang][cat]
+		samples.RUnlock()
+		return s[rand.Intn(len(s))]
 	}
 	samples.RUnlock()
 
@@ -118,7 +122,6 @@ func generate(lang, cat string, fallback bool) string {
 	}
 	return s[rand.Intn(len(s))]
 }
-
 func populateSamples(lang, cat string) ([]string, error) {
 	data, err := readFile(lang, cat)
 	if err != nil {

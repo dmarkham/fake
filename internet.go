@@ -1,9 +1,8 @@
 package fake
 
 import (
-	"net"
 	"math/rand"
-	"strconv"
+	"net"
 	"strings"
 
 	"github.com/corpix/uarand"
@@ -58,7 +57,7 @@ func IPv4() string {
 	size := 4
 	ip := make([]byte, size)
 	for i := 0; i < size; i++ {
-		ip[i] = byte(r.Intn(256))
+		ip[i] = byte(rand.Intn(256))
 	}
 	return net.IP(ip).To4().String()
 }
@@ -68,7 +67,7 @@ func IPv6() string {
 	size := 16
 	ip := make([]byte, size)
 	for i := 0; i < size; i++ {
-		ip[i] = byte(r.Intn(256))
+		ip[i] = byte(rand.Intn(256))
 	}
 	return net.IP(ip).To16().String()
 }
