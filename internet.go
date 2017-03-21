@@ -2,6 +2,8 @@ package fake
 
 import (
 	"net"
+	"math/rand"
+	"strconv"
 	"strings"
 
 	"github.com/corpix/uarand"
@@ -11,13 +13,13 @@ import (
 // first name + last name, letter + last names or concatenation of from 1 to 3 lowercased words
 func UserName() string {
 	gender := randGender()
-	switch r.Intn(3) {
+	switch rand.Intn(3) {
 	case 0:
 		return lookup("en", gender+"_first_names", false) + lookup(lang, gender+"_last_names", false)
 	case 1:
 		return Character() + lookup(lang, gender+"_last_names", false)
 	default:
-		return strings.Replace(WordsN(r.Intn(3)+1), " ", "_", -1)
+		return strings.Replace(WordsN(rand.Intn(3)+1), " ", "_", -1)
 	}
 }
 

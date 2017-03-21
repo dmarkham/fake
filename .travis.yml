@@ -2,14 +2,11 @@ sudo: false
 language: go
 
 go:
-  - 1.6
   - 1.7
-  - 1.8
-  - master
   - tip
 
 install:
-  - make
-  - go get -v -d ./...
+  - go get -v -d -t ./...
 
-script: make test
+script:
+  - go test -v -race ./...
