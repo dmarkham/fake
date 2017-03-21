@@ -1,6 +1,9 @@
 package fake
 
-import "math/rand"
+import (
+		"fmt"
+		"math/rand"
+	)
 
 //Choose selects a random item from the given set
 func Choose(v ...interface{}) interface{} {
